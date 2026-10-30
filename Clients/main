@@ -1,33 +1,70 @@
 import pygame
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
+pygame.display.set_caption("LLoop")
 clock = pygame.time.Clock()
-x = 400 
-y = 300
+font = pygame.font.SysFont("arial", 50)
+small_font = pygame.font.SysFont("arial", 30)
+# Text
+text_surface = font.render("Press Enter", True, (255, 255, 255))
+title_font = pygame.font.SysFont("arial", 50)  # Заменили на arial для стабильности, но можно вернуть "Fredoka"
+title_surface = title_font.render("LLoop", True, (255, 255, 255))
+story_text = small_font.render("Story mode", True, (255, 255, 255))
+level1_text = small_font.render("Level 1", True, (255, 255, 255))
+endless_text = small_font.render("Endless mode", True, (255, 255, 255))
+# State
+state = "Start_screen"
+# Buttons
+start_button = pygame.Rect(250, 230, 300, 100)
+story_button = pygame.Rect(150, 350, 220, 80)
+endless_button = pygame.Rect(430, 350, 220, 80)
+level1_button = pygame.Rect(290, 250, 220, 80)
 running = True
 while running:
-    for event in pygame.event.get():  # 1
+    for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-    if pygame.key.get_pressed()[pygame.K_RIGHT]:
-        x += 5 
-    elif pygame.key.get_pressed()[pygame.K_LEFT]:
-        x -= 5
-    elif pygame.key.get_pressed()[pygame.K_UP]:
-        y -= 5
-    elif pygame.key.get_pressed()[pygame.K_DOWN]:
-        y += 5
-    if x > 760:
-         x = 760
-    if x < 0:
-        x = 0
-    if y > 560:
-        y = 560
-    if y < 0:
-        y = 0
-    
-    screen.fill((22, 32, 46))  
-    pygame.draw.rect(screen, ( 242, 154, 74), (x, y, 40, 40))
+        # Keyboard
+        if event.type == pygame.KEYDOWN:
+            if state == "Start_screen":
+                if event.key == pygame.K_RETURN:
+                    state = "Main_menu"
+        # Mouse
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if state == "Start_screen":
+                if start_button.collidepoint(event.pos):  # Теперь клик мышкой по зеленой кнопке работает
+                    state = "Main_menu"
+            elif state == "Main_menu":
+                if story_button.collidepoint(event.pos):
+                    state = "Story_mode"
+                if endless_button.collidepoint(event.pos):
+                    state = "Endless_mode"
+            elif state == "Story_mode":
+                if level1_button.collidepoint(event.pos):
+                    state = "Level_1"
+    # Background
+    screen.fill((22, 32, 46))
+    # Start screen
+    if state == "Start_screen":
+        pygame.draw.rect(screen, (0, 180, 0), start_button)
+        screen.blit(text_surface, (280, 250))
+    # Main menu
+    elif state == "Main_menu":
+        screen.blit(title_surface, (330, 150))
+        pygame.draw.rect(screen, (0, 120, 200), story_button)
+        pygame.draw.rect(screen, (0, 120, 200), endless_button)
+        screen.blit(story_text, (180, 370))
+        screen.blit(endless_text, (440, 370))
+    # Story mode
+    elif state == "Story_mode":
+        pygame.draw.rect(screen, (0, 120, 200), level1_button)
+        screen.blit(level1_text, (330, 270))
+    # Level 1
+    elif state == "Level_1":
+        pass
+    # Endless mode
+    elif state == "Endless_mode":
+        pass
     pygame.display.flip()
-    clock.tick(60)  # 4
+    clock.tick(60)
 pygame.quit()
